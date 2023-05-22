@@ -1,4 +1,4 @@
-name: Docker build and deploy to CapRover
+name: Docker build and deploy
 on:
   push:
     branches:
@@ -25,7 +25,7 @@ jobs:
       - name: Build, tag, and push image to CapRover
         id: build-image
         run: |
-          docker build -t oostvoort/conference-rs ./Dockerfile
+          docker build -t oostvoort/conference-rs .
           docker tag built-image-name oostvoort/conference-rs:dev
           docker push oostvoort/conference-rs:dev
                    
