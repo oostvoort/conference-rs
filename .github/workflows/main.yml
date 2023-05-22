@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}    
 
-      - name: Build, tag, and push image to CapRover
+      - name: Build, tag, and push image
         id: build-image
         run: |
           docker build -t oostvoort/conference-rs .
