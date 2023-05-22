@@ -25,6 +25,7 @@ export interface ServerProducerAdded {
     participantId: ParticipantId;
     displayName: string;
     isShareScreen: boolean;
+    isEnabled: boolean;
     producerId: ProducerId;
 }
 

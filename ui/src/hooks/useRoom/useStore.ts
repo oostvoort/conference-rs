@@ -32,8 +32,9 @@ const useStore = create<RoomStore>((set, get) => ({
     producerId,
     displayName,
     isShareScreen,
+    isEnabled,
     track
-  ) => set((state) => addProducer(participantId, producerId, displayName, isShareScreen, track, state)),
+  ) => set((state) => addProducer(participantId, producerId, displayName, isShareScreen, isEnabled, track, state)),
   removeProducer: (participantId, producerId) => set((state) => removeProducer(participantId, producerId, state)),
   onToggleMedia: (participantId, isPlay, kind) => set(state => onToggleMedia(participantId, isPlay, kind, state))
 

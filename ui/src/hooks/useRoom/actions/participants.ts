@@ -2,9 +2,23 @@ import Producer from "../../../lib/MediasoupClient/Producer";
 import Participant from "../../../lib/MediasoupClient/Participant";
 import {RoomParticipantsStore, RoomUserStore} from "../types";
 import {MediaKind} from "mediasoup-client/lib/RtpParameters";
-export const addProducer = (participantId: string, producerId: string, displayName: string, isShareScreen: boolean, track: MediaStreamTrack, state: RoomParticipantsStore) => {
+export const addProducer = (
+  participantId: string,
+  producerId: string,
+  displayName: string,
+  isShareScreen: boolean,
+  isEnabled: boolean,
+  track: MediaStreamTrack,
+  state: RoomParticipantsStore
+) => {
   const producer = new Producer(producerId, track)
-  const participant = new Participant(participantId, 'current-room', [producer], displayName, isShareScreen)
+  const participant = new Participant(
+    participantId,
+    'current-room',
+    [producer],
+    displayName,
+    isShareScreen
+  )
 
   if (isShareScreen) {
     return {
@@ -13,13 +27,16 @@ export const addProducer = (participantId: string, producerId: string, displayNa
   }
 
   const index = state.participants.findIndex(({id}) => id === participantId)
-  if (index > -1) state.participants[index].addProducer(producerId, track)
-  else return {
-    participants: [...state.participants, participant]
-  }
+  const currentParticipant = index > -1 ? state.participants[index] : participant
+  currentParticipant.setPlayMedia(track.kind as MediaKind, isEnabled)
 
-  return {
-    participants: state.participants
+  if (index > -1) {
+    currentParticipant.addProducer(producerId, track)
+    return {
+      participants: state.participants
+    }
+  } else return {
+    participants: [...state.participants, currentParticipant]
   }
 }
 

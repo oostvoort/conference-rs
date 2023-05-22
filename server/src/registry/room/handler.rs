@@ -8,7 +8,7 @@ use std::sync::Arc;
 #[derive(Default)]
 pub struct Handler {
     pub producer_add:
-        Bag<Arc<dyn Fn(&Id, &String, &Producer, &bool) + Send + Sync>, Id, String, Producer, bool>,
+        Bag<Arc<dyn Fn(&Id, &String, &Producer, &bool, &bool) + Send + Sync>, Id, String, Producer, bool, bool>,
     pub producer_remove: Bag<Arc<dyn Fn(&Id, &ProducerId) + Send + Sync>, Id, ProducerId>,
     pub toggle_media: Bag<Arc<dyn Fn(&Id, &MediaKind, &bool) + Send + Sync>, Id, MediaKind, bool>,
     pub broadcast_action: Bag<Arc<dyn Fn(&String, &Id) + Send + Sync>, String, Id>,

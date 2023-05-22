@@ -69,6 +69,7 @@ impl Broadcast for super::Room {
             &display_name,
             &producer,
             &is_share_screen,
+            &!producer.paused()
         );
     }
 
