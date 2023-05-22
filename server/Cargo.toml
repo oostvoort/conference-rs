@@ -1,0 +1,32 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+[build]
+target = "x86_64-unknown-linux-musl"
+
+[dependencies]
+# Added mediasoup as submodule since mediasoup-sys on crates.io
+# does not have the necessary subprojects/wrappers needed to build the project
+mediasoup-sys = "0.5.4"
+mediasoup = "0.11.4"
+anyhow = "1.0.69"
+axum = { version = "0.6.17", features = ["ws", "multipart"] }
+axum-server = { version = "0.5.1", features = ["tls-rustls"] }
+dotenvy = "0.15.6"
+event-listener-primitives = "2.0.1"
+futures = "0.3.26"
+parking_lot = "0.12.1"
+rand = "0.8.5"
+serde = "1.0.152"
+serde_json = "1.0.94"
+tokio = { version = "1.0", features = ["full"] }
+tower-http = { version = "0.4.0", features = ["add-extension", "fs"] }
+uuid = "1.3.0"
+y-sync = "0.3"
+yrs = "0.16.4"
+log = "0.4.17"
+env_logger = "0.10.0"
+hyper = "0.14.26"
+

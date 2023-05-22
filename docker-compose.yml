@@ -1,0 +1,13 @@
+services:
+  conference:
+    image: oostvoort/conference-rs:latest
+    container_name: conference_rs
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+      - '40000-40050:40000-40050'
+    environment:
+    - RTC_PORT_RANGE_START=40000
+    - RTC_PORT_RANGE_END=40050
+    - WEBRTC_LISTEN_IP=127.0.0.1
+    - RUST_LOG=server=trace
