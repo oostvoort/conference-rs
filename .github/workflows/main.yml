@@ -26,6 +26,6 @@ jobs:
         id: build-image
         run: |
           docker build -t oostvoort/conference-rs .
-          docker tag built-image-name oostvoort/conference-rs:dev
+          docker tag conference-rs oostvoort/conference-rs:dev
           docker push oostvoort/conference-rs:dev
                    
