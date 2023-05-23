@@ -1,6 +1,7 @@
 // @ts-ignore
 import React, {lazy, Suspense} from 'react'
 import useStore from "../../../hooks/useRoom/useStore.ts";
+import useIsAudioOnly from "../../../hooks/useRoom/useIsAudioOnly";
 
 // Dynamic Import
 const DynamicVideo = lazy(() => import("../../../components/shared/Video"))
@@ -13,7 +14,7 @@ type PropsType = {
 }
 
 const ParticipantList = ({isShareScreen = false, isShowMemo, screenSizeObserver}: PropsType) => {
-    const isAudioOnly = window.location.pathname.includes('voice')
+    const isAudioOnly = useIsAudioOnly()
 
     const [
         participants,
@@ -41,7 +42,7 @@ const ParticipantList = ({isShareScreen = false, isShowMemo, screenSizeObserver}
                                     playsInline={true}
                                     totalParticipants={participants.length + 1}
                                     className={'bg-primary3 w-full h-full rounded-xl'}
-                                    tracks={participant.mediaStreamTracks()}
+                                    mediaStream={participant.mediaStream}
                                 />
                             </Suspense>
                             <div

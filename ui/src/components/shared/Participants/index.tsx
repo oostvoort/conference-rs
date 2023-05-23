@@ -107,7 +107,7 @@ const Participants = () => {
                                     controls={false}
                                     playsInline={true}
                                     tw={'bg-primary3 w-full h-full rounded-xl'}
-                                    tracks={screensharer.mediaStreamTracks()}
+                                    mediaStream={screensharer.mediaStream}
                                 />
                                 <ParticipantName>{screensharer.displayName.replace('-ScreenShare', '')}</ParticipantName>
                             </div>

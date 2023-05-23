@@ -11,15 +11,8 @@ class User extends OwnParticipant {
   }
 
   toggleMedia(kind: MediaKind) {
-    if (this.mediaStream) {
-      if (kind === 'audio') {
-        const isEnabled = this.mediaStream.getAudioTracks()[0].enabled
-        this.mediaStream.getAudioTracks()[0].enabled = !isEnabled
-      } else {
-        const isEnabled = this.mediaStream.getVideoTracks()[0].enabled
-        this.mediaStream.getVideoTracks()[0].enabled = !isEnabled
-      }
-    }
+    const track = this.getTrackByKind(kind)
+    if (track) track.enabled = !track.enabled
     this.sendClientMessage({ action: 'ToggleMedia', kind})
   }
 
