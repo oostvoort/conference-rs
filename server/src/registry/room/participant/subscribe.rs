@@ -46,7 +46,7 @@ impl SubscribeEvent for Connection {
         let handler_id = match event {
             Event::OnProducerAdd => {
                 self.room.on_producer_add(handle_on_producer_add::<
-                    fn(&Id, &String, &Producer, &bool),
+                    fn(&Id, &String, &Producer, &bool, &bool),
                 >(self.id.clone(), server_message_sender))
             }
             Event::OnProducerRemove => self.room.on_producer_remove(handle_on_producer_remove::<
@@ -72,19 +72,22 @@ impl SubscribeEvent for Connection {
     }
 }
 
-fn handle_on_producer_add<F: Fn(&Id, &String, &Producer, &bool) + Send + Sync + 'static>(
+fn handle_on_producer_add<F: Fn(&Id, &String, &Producer, &bool, &bool) + Send + Sync + 'static>(
     own_participant_id: Id,
     tx: UnboundedSender<ServerMessage>,
-) -> impl Fn(&Id, &String, &Producer, &bool) + Send + Sync {
+) -> impl Fn(&Id, &String, &Producer, &bool, &bool) + Send + Sync {
     move |participant_id: &Id,
           display_name: &String,
           producer: &Producer,
-          is_share_screen: &bool| {
+          is_share_screen: &bool,
+          is_enabled: &bool
+    | {
         if &own_participant_id == participant_id {
             return;
         }
         if let Err(e) = tx.send(ServerMessage::ProducerAdded {
             is_share_screen: *is_share_screen,
+            is_enabled: *is_enabled,
             participant_id: participant_id.clone(),
             display_name: display_name.clone(),
             producer_id: producer.id(),

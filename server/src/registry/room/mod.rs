@@ -5,7 +5,7 @@ use std::time::Duration;
 use handler::Handler;
 use inner::Inner;
 use log::error;
-use mediasoup::prelude::{Producer, ProducerId, Router, RouterOptions, WorkerManager};
+use mediasoup::prelude::{ProducerId, Router, RouterOptions, WorkerManager};
 use parking_lot::Mutex;
 use participant::Participant;
 use tokio::sync::RwLock;
@@ -83,7 +83,7 @@ impl Room {
 
     /// Get all producers of all participants, useful when new participant connects and needs to
     /// consume tracks of everyone who is already in the room
-    pub fn get_all_producers(&self) -> Vec<(Id, String, ProducerId, bool)> {
+    pub fn get_all_producers(&self) -> Vec<(Id, String, ProducerId, bool, bool)> {
         self.inner
             .clients
             .lock()
@@ -97,6 +97,7 @@ impl Room {
                         display_name.clone(),
                         producer.id(),
                         room_participant.is_share_screen,
+                        !producer.paused()
                     )
                 })
             })
@@ -192,31 +193,5 @@ impl Room {
             }
         }
         result
-    }
-
-    pub async fn toggle_producer(&self) {}
-
-    pub fn update_producer(
-        &self,
-        is_share_screen: bool,
-        participant_id: Id,
-        display_name: String,
-        producers: Vec<Producer>,
-    ) {
-        self.inner
-            .clients
-            .lock()
-            .insert(
-                participant_id,
-                Participant {
-                    is_share_screen,
-                    producers,
-                    display_name,
-                },
-            )
-            .expect("")
-            .display_name = display_name.clone();
-
-        println!("{:#?}", &self.inner.clients.lock());
     }
 }

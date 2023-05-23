@@ -124,9 +124,10 @@ impl Connection {
 
         // Notify client about any producers that already exist in the room
         let all_producers = self.room.get_all_producers();
-        for (participant_id, display_name, producer_id, is_share_screen) in all_producers {
+        for (participant_id, display_name, producer_id, is_share_screen, is_enabled) in all_producers {
             if let Err(e) = server_message_sender.send(ServerMessage::ProducerAdded {
                 is_share_screen,
+                is_enabled,
                 participant_id,
                 display_name,
                 producer_id,

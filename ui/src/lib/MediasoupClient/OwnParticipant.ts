@@ -241,7 +241,15 @@ class OwnParticipant extends Participant {
                     action: 'ConsumerResume',
                     id: consumer.id as ConsumerId,
                   })
-                  this.eventEmitter.emit('addProducer', message.participantId, message.producerId, message.displayName, message.isShareScreen, consumer.track)
+                  this.eventEmitter.emit(
+                    'addProducer',
+                    message.participantId,
+                    message.producerId,
+                    message.displayName,
+                    message.isShareScreen,
+                    message.isEnabled,
+                    consumer.track
+                  )
                   resolve(undefined)
                 })
               }

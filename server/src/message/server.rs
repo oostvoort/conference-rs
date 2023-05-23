@@ -26,6 +26,7 @@ pub enum ServerMessage {
     #[serde(rename_all = "camelCase")]
     ProducerAdded {
         is_share_screen: bool,
+        is_enabled: bool,
         participant_id: Id,
         display_name: String,
         producer_id: ProducerId,

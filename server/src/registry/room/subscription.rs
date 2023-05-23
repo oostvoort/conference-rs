@@ -7,7 +7,7 @@ use server::types::Id;
 
 pub trait Subscribe {
     /// Subscribe to notifications when new producer is added to the room
-    fn on_producer_add<F: Fn(&Id, &String, &Producer, &bool) + Send + Sync + 'static>(
+    fn on_producer_add<F: Fn(&Id, &String, &Producer, &bool, &bool) + Send + Sync + 'static>(
         &self,
         callback: F,
     ) -> HandlerId;
@@ -36,7 +36,7 @@ pub trait Subscribe {
 
 impl Subscribe for super::Room {
     /// Subscribe to notifications when new producer is added to the room
-    fn on_producer_add<F: Fn(&Id, &String, &Producer, &bool) + Send + Sync + 'static>(
+    fn on_producer_add<F: Fn(&Id, &String, &Producer, &bool, &bool) + Send + Sync + 'static>(
         &self,
         callback: F,
     ) -> HandlerId {

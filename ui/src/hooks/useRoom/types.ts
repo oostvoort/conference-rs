@@ -28,7 +28,7 @@ export type RoomParticipantsStore = {
 }
 
 export type RoomParticipantsActions = {
-  addProducer: (participantId: string, producerId: string, displayName: string, isShareScreen: boolean, track: MediaStreamTrack) => void
+  addProducer: (participantId: string, producerId: string, displayName: string, isShareScreen: boolean, isEnabled: boolean, track: MediaStreamTrack) => void
   removeProducer: (participantId: string, producerId: string) => void,
   onToggleMedia: (participantId: string, isPlay: boolean, kind: MediaKind) => void
 }
