@@ -25,7 +25,6 @@ jobs:
       - name: Build, tag, and push image
         id: build-image
         run: |
-          docker build -t oostvoort/conference-rs .
-          docker tag conference-rs oostvoort/conference-rs:dev
+          docker build -t oostvoort/conference-rs:dev .
           docker push oostvoort/conference-rs:dev
                    
