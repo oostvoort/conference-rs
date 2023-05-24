@@ -17,6 +17,7 @@ export const createUser = (roomId: string, displayName: string, isAudioOnly: boo
     user.eventEmitter.on('addProducer', state.addProducer)
     user.eventEmitter.on('removeProducer', state.removeProducer)
     user.eventEmitter.on('toggleMedia', state.onToggleMedia)
+    user.eventEmitter.on('activeSpeakerChange', state.setActiveSpeaker)
   })
   return createUser
 }

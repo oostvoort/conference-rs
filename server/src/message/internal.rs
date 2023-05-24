@@ -1,5 +1,5 @@
 use mediasoup::consumer::Consumer;
-use mediasoup::prelude::Producer;
+use mediasoup::prelude::{Producer, ProducerId};
 
 /// Internal actor messages for convenience
 pub enum InternalMessage {
@@ -11,4 +11,7 @@ pub enum InternalMessage {
     
     /// Stop/close the WebSocket connection
     Stop,
+
+    /// Sets the active speaker
+    ActiveSpeaker(Option<ProducerId>)
 }

@@ -5,7 +5,9 @@ use std::time::Duration;
 use handler::Handler;
 use inner::Inner;
 use log::error;
-use mediasoup::prelude::{ProducerId, Router, RouterOptions, WorkerManager};
+use mediasoup::active_speaker_observer::{ActiveSpeakerObserver, ActiveSpeakerObserverOptions};
+use mediasoup::audio_level_observer::AudioLevelObserverOptions;
+use mediasoup::prelude::{AudioLevelObserver, ProducerId, Router, RouterOptions, WorkerManager};
 use parking_lot::Mutex;
 use participant::Participant;
 use tokio::sync::RwLock;
@@ -58,9 +60,21 @@ impl Room {
         let doc = Doc::new();
         let awareness = Arc::new(RwLock::new(Awareness::new(doc.clone())));
 
+        let active_speaker_observer = router
+            .create_active_speaker_observer(ActiveSpeakerObserverOptions::default())
+            .await
+            .map_err(|error| format!("Failed to create active speaker observer: {error}"))?;
+
+        let audio_level_observer = router
+            .create_audio_level_observer(AudioLevelObserverOptions::default())
+            .await
+            .map_err(|error| format!("Failed to create audio level observer: {error}"))?;
+
         Ok(Self {
             inner: Arc::new(Inner {
                 id,
+                audio_level_observer,
+                active_speaker_observer,
                 router,
                 handlers: Handler::default(),
                 clients: Mutex::default(),
@@ -80,6 +94,12 @@ impl Room {
     pub fn router(&self) -> &Router {
         &self.inner.router
     }
+
+    /// Get active_speaker_observer associated with this room
+    pub fn active_speaker_observer(&self) -> &ActiveSpeakerObserver { &self.inner.active_speaker_observer }
+
+    /// Get audio_level_observer associated with this room
+    pub fn audio_level_observer(&self) -> &AudioLevelObserver { &self.inner.audio_level_observer }
 
     /// Get all producers of all participants, useful when new participant connects and needs to
     /// consume tracks of everyone who is already in the room
@@ -102,6 +122,22 @@ impl Room {
                 })
             })
             .collect()
+    }
+
+    /// Get participant_id from producer_id
+    pub fn get_participant_id_from_producer_id(&self, producer_id: ProducerId) -> Option<Id> {
+        match self.inner
+            .clients
+            .lock()
+            .iter()
+            .find(|(_, room_participant)| {
+                return room_participant.producers.iter().find(|producer| {
+                    producer_id == producer.id()
+                }).is_some()
+            }) {
+            Some((participant_id, _)) => Some(participant_id.clone()),
+            None => None
+        }
     }
 
     /// Get `WeakRoom` that can later be upgraded to `Room`, but will not prevent room from

@@ -1,6 +1,8 @@
 // @ts-ignore
 import React, {lazy, Suspense} from 'react'
 import useStore from "../../../hooks/useRoom/useStore.ts";
+import useActiveSpeaker from "../../../hooks/useRoom/useActiveSpeaker";
+import clsx from "clsx";
 
 // Dynamic Import
 const DynamicVideo = lazy(() => import("../../../components/shared/Video"))
@@ -21,6 +23,8 @@ const ParticipantList = ({isShareScreen = false, isShowMemo, screenSizeObserver}
         state.participants,
     ])
 
+    const { activeSpeaker } = useActiveSpeaker()
+
     return (
         <>
             {
@@ -40,7 +44,10 @@ const ParticipantList = ({isShareScreen = false, isShowMemo, screenSizeObserver}
                                     controls={false}
                                     playsInline={true}
                                     totalParticipants={participants.length + 1}
-                                    className={'bg-primary3 w-full h-full rounded-xl'}
+                                    className={clsx([
+                                        'bg-primary3 w-full h-full rounded-xl',
+                                        {'border-4 border-secondary1 divide-solid': activeSpeaker === participant.id}
+                                    ])}
                                     tracks={participant.mediaStreamTracks()}
                                 />
                             </Suspense>

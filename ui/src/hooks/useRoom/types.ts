@@ -25,12 +25,14 @@ export type RoomUserActions = {
 export type RoomParticipantsStore = {
   participants: Participant[]
   screenSharers: Participant[]
+  activeSpeaker: string | null
 }
 
 export type RoomParticipantsActions = {
   addProducer: (participantId: string, producerId: string, displayName: string, isShareScreen: boolean, isEnabled: boolean, track: MediaStreamTrack) => void
   removeProducer: (participantId: string, producerId: string) => void,
   onToggleMedia: (participantId: string, isPlay: boolean, kind: MediaKind) => void
+  setActiveSpeaker: (participantId: string | null) => void
 }
 
 export type RoomStore = RoomUserStore & RoomUserActions & RoomParticipantsStore & RoomParticipantsActions
