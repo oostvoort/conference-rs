@@ -14,6 +14,8 @@ import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css"
 import useMeetingNotesStore from "../../../config/useMeetingNotesStore.ts";
 import useIsAudioOnly from "../../../hooks/useRoom/useIsAudioOnly";
+import useActiveSpeaker from "../../../hooks/useRoom/useActiveSpeaker";
+import clsx from "clsx";
 
 // Dynamic Import
 const DynamicParticipantList = lazy(() => import("../ParticipantList"))
@@ -39,6 +41,8 @@ const Participants = () => {
     const participantPanel = useRef(null)
 
     const showShareScreen = !!screensharer
+
+    const { isUser } = useActiveSpeaker()
 
     React.useEffect(() => {
         const resizeObserver = new ResizeObserver(entries => {
@@ -78,6 +82,9 @@ const Participants = () => {
                                                         controls={false}
                                                         playsInline={true}
                                                         mediaStream={user.mediaStream}
+                                                        className={clsx([
+                                                            {'border-4 border-secondary1 divide-solid': isUser}
+                                                        ])}
                                                     />
                                                 </Suspense>
                                             </VideoRenderContainer>

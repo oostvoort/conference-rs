@@ -68,6 +68,11 @@ export interface ServerBroadcastAction {
   from: ParticipantId
 }
 
+export interface ServerActiveSpeaker {
+  action: 'ActiveSpeaker',
+  participantId: ParticipantId | null
+}
+
 export type ServerMessage =
     ServerInit |
     ServerProducerAdded |
@@ -77,7 +82,8 @@ export type ServerMessage =
     ServerConnectedConsumerTransport |
     ServerConsumed |
     ServerToggleMedia |
-    ServerBroadcastAction;
+    ServerBroadcastAction |
+    ServerActiveSpeaker;
 
 export interface ClientInit {
     action: 'Init';

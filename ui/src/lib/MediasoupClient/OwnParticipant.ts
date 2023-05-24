@@ -272,6 +272,10 @@ class OwnParticipant extends Participant {
           this.eventEmitter.emit('actionBroadcast', message.kind, message.from)
           break
         }
+        case "ActiveSpeaker": {
+          this.eventEmitter.emit('activeSpeakerChange', message.participantId)
+          break
+        }
         default: {
           console.error('Received unexpected message', message)
         }
