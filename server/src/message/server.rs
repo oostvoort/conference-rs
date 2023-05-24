@@ -75,6 +75,6 @@ pub enum ServerMessage {
     #[serde(rename_all = "camelCase")]
     BroadcastAction { kind: String, from: Id },
 
-    /// Notification that this participant is the Active Speaker
-    ActiveSpeaker { participant_id: Id }
+    /// Notification if there's been a change in the active speaker
+    ActiveSpeaker { participant_id: Option<Id> }
 }

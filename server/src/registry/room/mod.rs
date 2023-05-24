@@ -6,7 +6,8 @@ use handler::Handler;
 use inner::Inner;
 use log::error;
 use mediasoup::active_speaker_observer::{ActiveSpeakerObserver, ActiveSpeakerObserverOptions};
-use mediasoup::prelude::{ProducerId, Router, RouterOptions, WorkerManager};
+use mediasoup::audio_level_observer::AudioLevelObserverOptions;
+use mediasoup::prelude::{AudioLevelObserver, ProducerId, Router, RouterOptions, WorkerManager};
 use parking_lot::Mutex;
 use participant::Participant;
 use tokio::sync::RwLock;
@@ -64,9 +65,15 @@ impl Room {
             .await
             .map_err(|error| format!("Failed to create active speaker observer: {error}"))?;
 
+        let audio_level_observer = router
+            .create_audio_level_observer(AudioLevelObserverOptions::default())
+            .await
+            .map_err(|error| format!("Failed to create audio level observer: {error}"))?;
+
         Ok(Self {
             inner: Arc::new(Inner {
                 id,
+                audio_level_observer,
                 active_speaker_observer,
                 router,
                 handlers: Handler::default(),
@@ -91,6 +98,9 @@ impl Room {
     /// Get active_speaker_observer associated with this room
     pub fn active_speaker_observer(&self) -> &ActiveSpeakerObserver { &self.inner.active_speaker_observer }
 
+    /// Get audio_level_observer associated with this room
+    pub fn audio_level_observer(&self) -> &AudioLevelObserver { &self.inner.audio_level_observer }
+
     /// Get all producers of all participants, useful when new participant connects and needs to
     /// consume tracks of everyone who is already in the room
     pub fn get_all_producers(&self) -> Vec<(Id, String, ProducerId, bool, bool)> {
@@ -113,7 +123,7 @@ impl Room {
             })
             .collect()
     }
-    
+
     /// Get participant_id from producer_id
     pub fn get_participant_id_from_producer_id(&self, producer_id: ProducerId) -> Option<Id> {
         match self.inner
