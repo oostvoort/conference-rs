@@ -1,20 +1,24 @@
 import { MediaKind } from 'mediasoup-client/lib/RtpParameters'
 
+type Producer = {
+  [p in MediaKind]: string
+}
+
 class Participant {
   id: string
   roomId: string
-  producers: { [kind: MediaKind]: string }
+  producers: Producer
   displayName: string
   isShareScreen: boolean
   mediaStream: MediaStream
 
-  constructor(id: string, roomId: string, displayName: string, isShareScreen: boolean, producers?: { [kind: MediaKind]: string }) {
+  constructor(id: string, roomId: string, displayName: string, isShareScreen: boolean) {
     this.id = id
     this.roomId = roomId
     this.displayName = displayName
     this.isShareScreen = isShareScreen
     this.mediaStream = new MediaStream()
-    this.producers = producers ?? {
+    this.producers = {
       audio: '',
       video: ''
     }
@@ -22,7 +26,7 @@ class Participant {
 
   addProducer(producerId: string, { track, kind, isEnabled }: {track?: MediaStreamTrack, kind?: MediaKind, isEnabled?: boolean }) {
     const mediaKind = kind ?? track?.kind
-    if (mediaKind) this.producers[mediaKind] = producerId
+    if (mediaKind) this.producers[mediaKind as MediaKind] = producerId
     if (track) {
       if (isEnabled !== undefined) track.enabled = isEnabled
       this.mediaStream.addTrack(track)
