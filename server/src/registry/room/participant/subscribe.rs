@@ -1,8 +1,9 @@
 use crate::message::server::ServerMessage;
 use log::error;
-use mediasoup::prelude::{MediaKind, Producer, ProducerId};
+use mediasoup::prelude::{ActiveSpeakerObserverDominantSpeaker, MediaKind, Producer, ProducerId};
 use server::types::Id;
 use tokio::sync::mpsc::UnboundedSender;
+use super::super::Room;
 
 use super::super::subscription::Subscribe;
 use super::connection::Connection;
@@ -12,6 +13,7 @@ pub enum Event {
     OnProducerRemove,
     ToggleMedia,
     OnActionBroadcast,
+    OnActiveSpeakerChange
 }
 
 pub trait SubscribeEvent {
@@ -36,6 +38,9 @@ impl SubscribeEvent for Connection {
 
         // Listen for action being broadcast
         self.subscribe_event(Event::OnActionBroadcast, server_message_sender.clone());
+
+        // Listen for changes in the active speaker
+        self.subscribe_event(Event::OnActiveSpeakerChange, server_message_sender.clone());
     }
 
     fn subscribe_event(
@@ -65,6 +70,14 @@ impl SubscribeEvent for Connection {
                 self.room
                     .on_action_broadcast(handle_on_action_broadcast::<fn(&String, &Id)>(
                         server_message_sender,
+                    ))
+            }
+            Event::OnActiveSpeakerChange => {
+                self.room
+                    .active_speaker_observer()
+                    .on_dominant_speaker(handle_on_active_speaker_change::<fn(&ActiveSpeakerObserverDominantSpeaker)>(
+                        self.room.clone(),
+                        server_message_sender
                     ))
             }
         };
@@ -141,6 +154,27 @@ fn handle_on_action_broadcast<F: Fn(&String, &Id) + Send + Sync + 'static>(
             from: participant_id.clone(),
         }) {
             error!("Failed to send server message (broadcast action): {}", e);
+        }
+    }
+}
+
+fn handle_on_active_speaker_change<F: Fn(&ActiveSpeakerObserverDominantSpeaker) + Send + Sync + 'static>(
+    room: Room,
+    tx: UnboundedSender<ServerMessage>,
+) -> impl Fn(&ActiveSpeakerObserverDominantSpeaker) + Send + Sync {
+    move |active_speaker_observer_dominant_speaker| {
+        let producer_id = active_speaker_observer_dominant_speaker.producer.id();
+        match room.get_participant_id_from_producer_id(producer_id){
+            Some(participant_id) => {
+                if let Err(e) = tx.send(ServerMessage::ActiveSpeaker {
+                    participant_id
+                }) {
+                    error!("Failed to send server message (active speaker change): {}", e)
+                };
+            }
+            None => {
+                error!("Failed to find participant for producer (active speaker change)")
+            }
         }
     }
 }
