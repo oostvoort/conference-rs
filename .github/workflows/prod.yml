@@ -1,0 +1,39 @@
+name: Docker build and deploy
+on:
+  push:
+    branches:
+      - prod
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          #registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}    
+
+      - name: Build, tag, and push image
+        id: build-image
+        run: |
+          docker build -t oostvoort/conference-rs:prod .
+          docker push oostvoort/conference-rs:prod
+
+      - name: Deploy
+        run: |
+          eval $(ssh-agent -s)
+          echo "${{ secrets.TOKEN_CONFERENCE }}" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -p 2201 161.49.100.214 >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          ssh ${{ secrets.TARGET_SERVER }} -C "docker compose -f ~/conference/prod/docker-compose.yml pull && docker compose -f ~/conference/prod/docker-compose.yml up --force-recreate -d"
