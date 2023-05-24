@@ -1,48 +1,83 @@
 import { MediaKind } from 'mediasoup-client/lib/RtpParameters'
-import Producer from './/Producer'
+
+type Producer = {
+  [p in MediaKind]: string
+}
 
 class Participant {
   id: string
   roomId: string
-  producers: Producer[]
+  producers: Producer
   displayName: string
   isShareScreen: boolean
+  mediaStream: MediaStream
 
-  constructor(id: string, roomId: string, producers: Producer[], displayName: string, isShareScreen: boolean) {
+  constructor(id: string, roomId: string, displayName: string, isShareScreen: boolean) {
     this.id = id
     this.roomId = roomId
-    this.producers = producers
     this.displayName = displayName
     this.isShareScreen = isShareScreen
+    this.mediaStream = new MediaStream()
+    this.producers = {
+      audio: '',
+      video: ''
+    }
   }
 
-  addProducer(producerId: string, track: MediaStreamTrack) {
-    this.producers = [...this.producers, new Producer(producerId, track)]
+  addProducer(producerId: string, { track, kind, isEnabled }: {track?: MediaStreamTrack, kind?: MediaKind, isEnabled?: boolean }) {
+    const mediaKind = kind ?? track?.kind
+    if (mediaKind) this.producers[mediaKind as MediaKind] = producerId
+    if (track) {
+      if (isEnabled !== undefined) track.enabled = isEnabled
+      this.mediaStream.addTrack(track)
+    }
   }
 
   setPlayMedia(kind: MediaKind, isEnabled: boolean) {
-    this.producers.forEach(producer => {
-      if(producer.track.kind === kind) producer.setPlayTrack(isEnabled)
-    })
+    const track = this.getTrackByKind(kind)
+    if(track) {
+      track.enabled = isEnabled
+    }
   }
   removeProducer(producerId: string) {
-    this.producers = this.producers.filter(producer => producer.id !== producerId)
+    const kind = this.getKindByProducerId(producerId)
+    this.producers[kind] = ''
+    const track = this.getTrackByKind(kind)
+    if(track) this.mediaStream.removeTrack(track)
   }
 
   mediaState() {
-    const mediaState: { audio: null | boolean, video: null | boolean } = {
-      audio: null,
-      video: null
+    return {
+      audio: this.getTrackByKind('audio')?.enabled,
+      video: this.getTrackByKind('video')?.enabled
     }
-    for (const producer of this.producers) {
-      if (producer.kind() === 'audio') mediaState["audio"] = producer.isTrackEnabled()
-      else if (producer.kind() === 'video') mediaState["video"] = producer.isTrackEnabled()
+  }
+  getKindByProducerId(id: string) {
+    for (const [kind, producerId] of Object.entries(this.producers)) {
+      if (id === producerId) return kind as MediaKind
     }
-    return mediaState
+    throw new Error('Producer ID not found')
   }
 
-  mediaStreamTracks() {
-    return this.producers.map(({ track }) => track)
+  getTrackByKind(kind: MediaKind) {
+    for (const track of this.mediaStream.getTracks()) {
+      if(track.kind === kind) return track
+    }
+    return null
+  }
+
+  producersCount () {
+    const activeProducers = Object.values(this.producers).filter(value => !!value)
+    return activeProducers.length
+  }
+
+  clone () {
+    const participant = new Participant(this.id, this.roomId, this.displayName, this.isShareScreen)
+    for (const [kind, producerId] of Object.entries(this.producers)) {
+      const track = this.getTrackByKind(kind as MediaKind) ?? undefined
+      participant.addProducer(producerId, { track, kind: kind as MediaKind })
+    }
+    return participant
   }
 }
 

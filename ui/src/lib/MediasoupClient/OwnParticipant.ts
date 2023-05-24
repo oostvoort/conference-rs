@@ -16,7 +16,6 @@ class OwnParticipant extends Participant {
   sequentialMessages: Promise<void> = Promise.resolve()
   producerTransport: Transport | undefined
   consumerTransport: Transport | undefined
-  mediaStream?: MediaStream
 
   eventEmitter: EventEmitter
   isAudioOnly: boolean
@@ -28,7 +27,7 @@ class OwnParticipant extends Participant {
     isShareScreen: boolean,
     isAudioOnly = false
   ) {
-    super(id, roomId, [], displayName, isShareScreen)
+    super(id, roomId, displayName, isShareScreen)
     this.state = 'loading'
 
     // this will help separate voice only rooms from audio and voice rooms
@@ -156,6 +155,10 @@ class OwnParticipant extends Participant {
         // And wait for confirmation, but, obviously, no error handling,
         // which you should definitely have in real-world applications
         this.waitingForResponse.set('Produced', ({ id }: { id: string }) => {
+          const track = this.mediaStream.getTracks().find(track => track.kind === kind)
+          if (track) {
+            this.addProducer(id, { kind })
+          }
           success({ id })
         })
       })
@@ -166,7 +169,7 @@ class OwnParticipant extends Participant {
 
     await this.setMediaStream()
     // And create producers for all tracks that were previously requested
-    for (const track of this.mediaStream!.getTracks()) {
+    for (const track of this.mediaStream.getTracks()) {
       await this.producerTransport.produce({ track })
       // console.debug(`${track.kind} producer created:`, producer);
     }
@@ -177,7 +180,7 @@ class OwnParticipant extends Participant {
     )
 
     // If the first track were to stop, the websocket connection should be severed
-    this.mediaStream!.getTracks()[0].onended = () => {
+    this.mediaStream.getTracks()[0].onended = () => {
       this.leave()
     }
 
@@ -241,7 +244,15 @@ class OwnParticipant extends Participant {
                     action: 'ConsumerResume',
                     id: consumer.id as ConsumerId,
                   })
-                  this.eventEmitter.emit('addProducer', message.participantId, message.producerId, message.displayName, message.isShareScreen, consumer.track)
+                  this.eventEmitter.emit(
+                    'addProducer',
+                    message.participantId,
+                    message.producerId,
+                    message.displayName,
+                    message.isShareScreen,
+                    message.isEnabled,
+                    consumer.track
+                  )
                   resolve(undefined)
                 })
               }
@@ -259,6 +270,10 @@ class OwnParticipant extends Participant {
         }
         case 'BroadcastAction': {
           this.eventEmitter.emit('actionBroadcast', message.kind, message.from)
+          break
+        }
+        case "ActiveSpeaker": {
+          this.eventEmitter.emit('activeSpeakerChange', message.participantId)
           break
         }
         default: {

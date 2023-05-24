@@ -1,10 +1,26 @@
-import Producer from "../../../lib/MediasoupClient/Producer";
 import Participant from "../../../lib/MediasoupClient/Participant";
 import {RoomParticipantsStore, RoomUserStore} from "../types";
 import {MediaKind} from "mediasoup-client/lib/RtpParameters";
-export const addProducer = (participantId: string, producerId: string, displayName: string, isShareScreen: boolean, track: MediaStreamTrack, state: RoomParticipantsStore) => {
-  const producer = new Producer(producerId, track)
-  const participant = new Participant(participantId, 'current-room', [producer], displayName, isShareScreen)
+export const addProducer = (
+  participantId: string,
+  producerId: string,
+  displayName: string,
+  isShareScreen: boolean,
+  isEnabled: boolean,
+  track: MediaStreamTrack,
+  state: RoomParticipantsStore
+) => {
+  const participant = new Participant(
+    participantId,
+    'current-room',
+    displayName,
+    isShareScreen
+  )
+
+  const index = state.participants.findIndex(({id}) => id === participantId)
+  const currentParticipant = index > -1 ? state.participants[index].clone() : participant
+  currentParticipant.addProducer(producerId, { track, isEnabled })
+
 
   if (isShareScreen) {
     return {
@@ -12,14 +28,15 @@ export const addProducer = (participantId: string, producerId: string, displayNa
     }
   }
 
-  const index = state.participants.findIndex(({id}) => id === participantId)
-  if (index > -1) state.participants[index].addProducer(producerId, track)
-  else return {
-    participants: [...state.participants, participant]
-  }
-
-  return {
-    participants: state.participants
+  if (index > -1) {
+    return {
+      participants: state.participants.map((participant, currentIndex) => {
+        if (currentIndex === index) return currentParticipant
+        else return participant
+      })
+    }
+  } else return {
+    participants: [...state.participants, currentParticipant]
   }
 }
 
@@ -36,14 +53,18 @@ export const removeProducer = (participantId: string, producerId: string, state:
 
   const participantIndex = state.participants.findIndex(({id}) => id === participantId)
   if (participantIndex === -1) return state
-  if (state.participants[participantIndex].producers.length < 2) {
+  const currentParticipant = state.participants[participantIndex].clone()
+  if (currentParticipant.producersCount() < 2) {
     return {
       participants: state.participants.filter((_, index) => index !== participantIndex)
     }
   }
-  state.participants[participantIndex].removeProducer(producerId)
+  currentParticipant.removeProducer(producerId)
   return {
-    participants: state.participants
+    participants: state.participants.map(participant => {
+      if (participant.id === currentParticipant.id) return currentParticipant
+      else return participant
+    })
   }
 }
 
@@ -51,7 +72,8 @@ export const onToggleMedia = (participantId: string, isPlay: boolean, kind: Medi
   return {
     participants: state.participants.map(participant => {
       if (participant.id !== participantId) return participant
-      participant.setPlayMedia(kind, isPlay)
+      const clonedParticipant = participant.clone()
+      clonedParticipant.setPlayMedia(kind, isPlay)
       return participant
     })
   }

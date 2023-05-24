@@ -45,6 +45,8 @@ pub struct Connection {
 
     pub is_video_enabled: bool,
     pub is_sound_enabled: bool,
+
+    pub last_active_speaker: Option<ProducerId>
 }
 
 impl Drop for Connection {
@@ -87,6 +89,7 @@ impl Connection {
             attached_handlers: Vec::new(),
             is_sound_enabled: true,
             is_video_enabled: true,
+            last_active_speaker: None
         })
     }
 
@@ -120,13 +123,14 @@ impl Connection {
             .send(Message::Text(serde_json::to_string(&server_init_message)?))
             .await?;
 
-        self.subscribe_events(server_message_sender.clone());
+        self.subscribe_events(server_message_sender.clone(), internal_message_sender.clone());
 
         // Notify client about any producers that already exist in the room
         let all_producers = self.room.get_all_producers();
-        for (participant_id, display_name, producer_id, is_share_screen) in all_producers {
+        for (participant_id, display_name, producer_id, is_share_screen, is_enabled) in all_producers {
             if let Err(e) = server_message_sender.send(ServerMessage::ProducerAdded {
                 is_share_screen,
+                is_enabled,
                 participant_id,
                 display_name,
                 producer_id,
@@ -153,6 +157,41 @@ impl Connection {
                             }
                             InternalMessage::SaveConsumer(consumer) => {
                                 self.consumers.insert(consumer.id(), consumer);
+                            }
+                            InternalMessage::ActiveSpeaker(producer_id) => {
+                                if producer_id != self.last_active_speaker {
+                                    let mut participant_id = None;
+                                    if let Some(producer_id) = producer_id {
+                                        // if there was an old active speaker, remove it
+                                        // so we only listen to the current active speaker
+                                        if let Some(active_speaker) = self.last_active_speaker {
+                                            if let Err(e) = self.room.audio_level_observer().remove_producer(active_speaker).await {
+                                                error!("remove producer error: {}", e)
+                                            }
+                                        }
+
+                                        // so that we can listen if the current active speaker goes silent and makes noise again
+                                        if let Err(e) = self.room
+                                            .audio_level_observer()
+                                            .add_producer(
+                                                RtpObserverAddProducerOptions::new(producer_id)
+                                            ).await {
+                                            error!("add producer error: {}", e)
+                                        }
+
+                                        participant_id = self.room.get_participant_id_from_producer_id(producer_id);
+                                    }
+
+                                    // send a message to everyone that there is a new active speaker
+                                    if let Err(e) = server_message_sender.clone().send(ServerMessage::ActiveSpeaker {
+                                            participant_id
+                                    }) {
+                                            error!("failed to send active speaker: {}", e)
+                                    }
+
+                                    // change to current active speaker
+                                    self.last_active_speaker = producer_id;
+                                }
                             }
                         }
                     }
