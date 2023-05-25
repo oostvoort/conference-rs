@@ -1,13 +1,13 @@
 use axum::async_trait;
 use log::error;
-use mediasoup::prelude::{MediaKind, Producer};
+use mediasoup::prelude::{MediaKind, Producer, RtpObserverAddProducerOptions, RtpObserver};
 use mediasoup::worker::RequestError;
 use server::types::Id;
 use std::ops::Deref;
 
 #[async_trait]
 pub trait Broadcast {
-    fn add_producer(
+    async fn add_producer(
         &self,
         participant_id: Id,
         display_name: String,
@@ -23,7 +23,7 @@ pub trait Broadcast {
 impl Broadcast for super::Room {
     /// Add producer to the room, this will trigger notifications to other participants that
     /// will be able to consume it
-    fn add_producer(
+    async fn add_producer(
         &self,
         participant_id: Id,
         display_name: String,
@@ -69,7 +69,16 @@ impl Broadcast for super::Room {
             &display_name,
             &producer,
             &is_share_screen,
+            &!producer.paused()
         );
+
+        if producer.kind() == MediaKind::Audio {
+            if let Err(e) = self.inner.active_speaker_observer.add_producer(
+                RtpObserverAddProducerOptions::new(producer.id())
+            ).await {
+                error!("room.active_speaker_observer error: {}", e)
+            }
+        }
     }
 
     /// Toggle media

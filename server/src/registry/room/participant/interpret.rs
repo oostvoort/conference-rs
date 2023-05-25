@@ -202,7 +202,7 @@ impl Produce for Connection {
                             display_name,
                             producer.clone(),
                             is_share_screen,
-                        );
+                        ).await;
                         // Producer is stored in a hashmap since if we don't do it, it will
                         // get destroyed as soon as its instance goes out out scope
                         internal_sender

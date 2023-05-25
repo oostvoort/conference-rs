@@ -13,16 +13,17 @@ const useStore = create<RoomStore>((set, get) => ({
   },
   participants: [],
   screenSharers: [],
+  activeSpeaker: null,
 
   /* user actions */
   joinRoom: async (roomId, displayName, isAudioOnly) => {
     const user = await createUser(roomId, displayName, isAudioOnly, get())
-    set({ user })
+    set({user})
   },
   attachEvent: (eventName, listener) => set((state) => attachEvent(eventName, listener, state)),
   toggleMedia: (kind) => set((state) => toggleMedia(kind, state)),
-  updateUser: (user) => set(() => ({ user })),
-  updateMyScreenShare: (myScreenShare) => set(() => ({ myScreenShare })),
+  updateUser: (user) => set(() => ({user})),
+  updateMyScreenShare: (myScreenShare) => set(() => ({myScreenShare})),
   leave: () => set(leave),
   stopShareScreen: () => set(state => stopShareScreen(state)),
 
@@ -32,11 +33,12 @@ const useStore = create<RoomStore>((set, get) => ({
     producerId,
     displayName,
     isShareScreen,
+    isEnabled,
     track
-  ) => set((state) => addProducer(participantId, producerId, displayName, isShareScreen, track, state)),
+  ) => set((state) => addProducer(participantId, producerId, displayName, isShareScreen, isEnabled, track, state)),
   removeProducer: (participantId, producerId) => set((state) => removeProducer(participantId, producerId, state)),
-  onToggleMedia: (participantId, isPlay, kind) => set(state => onToggleMedia(participantId, isPlay, kind, state))
-
+  onToggleMedia: (participantId, isPlay, kind) => set(state => onToggleMedia(participantId, isPlay, kind, state)),
+  setActiveSpeaker: (participantId) => set({activeSpeaker: participantId})
 }))
 
 export default useStore

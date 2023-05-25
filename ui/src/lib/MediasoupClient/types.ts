@@ -25,6 +25,7 @@ export interface ServerProducerAdded {
     participantId: ParticipantId;
     displayName: string;
     isShareScreen: boolean;
+    isEnabled: boolean;
     producerId: ProducerId;
 }
 
@@ -67,6 +68,11 @@ export interface ServerBroadcastAction {
   from: ParticipantId
 }
 
+export interface ServerActiveSpeaker {
+  action: 'ActiveSpeaker',
+  participantId: ParticipantId | null
+}
+
 export type ServerMessage =
     ServerInit |
     ServerProducerAdded |
@@ -76,7 +82,8 @@ export type ServerMessage =
     ServerConnectedConsumerTransport |
     ServerConsumed |
     ServerToggleMedia |
-    ServerBroadcastAction;
+    ServerBroadcastAction |
+    ServerActiveSpeaker;
 
 export interface ClientInit {
     action: 'Init';

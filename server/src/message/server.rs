@@ -26,6 +26,7 @@ pub enum ServerMessage {
     #[serde(rename_all = "camelCase")]
     ProducerAdded {
         is_share_screen: bool,
+        is_enabled: bool,
         participant_id: Id,
         display_name: String,
         producer_id: ProducerId,
@@ -73,4 +74,8 @@ pub enum ServerMessage {
     /// Notification that someone requested to broadcast action to all participants
     #[serde(rename_all = "camelCase")]
     BroadcastAction { kind: String, from: Id },
+
+    /// Notification if there's been a change in the active speaker
+    #[serde(rename_all = "camelCase")]
+    ActiveSpeaker { participant_id: Option<Id> }
 }

@@ -3,6 +3,8 @@ use std::fmt;
 use std::sync::Arc;
 
 use log::info;
+use mediasoup::active_speaker_observer::ActiveSpeakerObserver;
+use mediasoup::audio_level_observer::AudioLevelObserver;
 use mediasoup::prelude::Router;
 use parking_lot::Mutex;
 use server::types::Id;
@@ -23,6 +25,8 @@ pub struct Inner {
     pub doc: Doc,
     pub awareness: Arc<RwLock<Awareness>>,
     pub share_screen_participant: Mutex<Option<Id>>,
+    pub active_speaker_observer: ActiveSpeakerObserver,
+    pub audio_level_observer: AudioLevelObserver,
 }
 
 impl fmt::Debug for Inner {
