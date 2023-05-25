@@ -73,6 +73,7 @@ const Participants = () => {
                                                         participant video ...</p></div>
                                                 }>
                                                     <DynamicVideo
+                                                        muted
                                                         screenSizeObserver={panelContainerSize}
                                                         isVoiceMode={isAudioOnly}
                                                         isShowMemo={memoSize != 0}
