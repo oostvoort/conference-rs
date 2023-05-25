@@ -72,6 +72,6 @@ const VoiceMode = ({tracks, mediaStream, totalParticipants, screenSizeObserver, 
     <div tw={"w-full h-full flex justify-center items-center"}>
       <ImageVoiceComp src={"/assets/icon_screen_off.svg"} alt={""} />
     </div>
-    <audio controls={false} ref={refAudio} />
+    <audio controls={false} ref={refAudio} muted={props.muted} />
   </VoiceComp>
 }
