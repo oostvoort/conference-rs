@@ -22,11 +22,11 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}    
 
-#      - name: Build, tag, and push image
-#        id: build-image
-#        run: |
-#          docker build -t oostvoort/conference-rs:dev .
-#          docker push oostvoort/conference-rs:dev
+      - name: Build, tag, and push image
+        id: build-image
+        run: |
+          docker build -t oostvoort/conference-rs:dev .
+          docker push oostvoort/conference-rs:dev
 
       - name: Deploy
         run: |
