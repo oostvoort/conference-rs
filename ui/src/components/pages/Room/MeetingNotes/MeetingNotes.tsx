@@ -1,13 +1,7 @@
 import {useRef} from 'react';
 import 'react-quill/dist/quill.snow.css';
-
-// y-websocket seems to be behind in package.json declaration. ignoring for now
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import {WebsocketProvider} from "y-websocket";
 import {useParams} from "react-router-dom";
 import useCollaborate from "../../../../hooks/useRoom/useCollaborate";
-
 import ReactQuill from "react-quill";
 
 function MeetingNotesComponents() {
