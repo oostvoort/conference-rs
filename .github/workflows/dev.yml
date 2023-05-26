@@ -22,16 +22,17 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}    
 
-      - name: Build, tag, and push image
-        id: build-image
-        run: |
-          docker build -t oostvoort/conference-rs:dev .
-          docker push oostvoort/conference-rs:dev
+#      - name: Build, tag, and push image
+#        id: build-image
+#        run: |
+#          docker build -t oostvoort/conference-rs:dev .
+#          docker push oostvoort/conference-rs:dev
 
       - name: Deploy
         run: |
           eval $(ssh-agent -s)
           echo "${{ secrets.TOKEN_CONFERENCE }}" | tr -d '\r' | ssh-add -
+          ls -al ~/
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan -p 2201 161.49.100.214 >> ~/.ssh/known_hosts
