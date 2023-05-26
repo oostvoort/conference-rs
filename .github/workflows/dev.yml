@@ -36,8 +36,11 @@ jobs:
           mkdir -p ~/.ssh
           ls -al ~/.ssh
           chmod 700 ~/.ssh
-          ls -al ~/.shh
+          ls -al ~/.ssh
           ssh-keyscan -p 2201 161.49.100.214 >> ~/.ssh/known_hosts
+          ls -al ~/.ssh
+          cat ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
+          echo "executing ssh command"
           ssh tabula-rasa@161.49.100.214 -p 2201 -C "docker compose -f ~/conference/dev/docker-compose.yml pull && docker compose -f ~/conference/dev/docker-compose.yml up --force-recreate -d"
 #run
