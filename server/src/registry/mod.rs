@@ -59,16 +59,10 @@ impl Registry {
             Entry::Vacant(entry) => {
                 let room = Room::new_with_id(worker_manager, room_id).await?;
                 entry.insert(room.downgrade());
-                room.on_close({
-                    let room_id = room.id();
-                    let rooms = Arc::clone(&self.rooms);
-
-                    move || {
-                        tokio::spawn(async move {
-                            rooms.lock().await.remove(&room_id);
-                        });
-                    }
-                })
+                room.on_close(
+                    self.on_close_callback(
+                        room.id()
+                    ))
                 .detach();
 
                 info!("Room {} created", room.id());
@@ -82,8 +76,19 @@ impl Registry {
         let mut rooms = self.rooms.lock().await;
         let room = Room::new(worker_manager).await?;
         rooms.insert(room.id(), room.downgrade());
-        room.on_close({
-            let room_id = room.id();
+        room.on_close(
+            self.on_close_callback(
+                room.id()
+            ))
+            .detach();
+
+        info!("Room {} created", room.id());
+        Ok(room)
+    }
+
+    fn on_close_callback(&self, room_id: room::id::RoomId) -> impl FnOnce() + Send + Sync
+    {
+        {
             let rooms = Arc::clone(&self.rooms);
 
             move || {
@@ -91,10 +96,6 @@ impl Registry {
                     rooms.lock().await.remove(&room_id);
                 });
             }
-        })
-        .detach();
-
-        info!("Room {} created", room.id());
-        Ok(room)
+        }
     }
 }
