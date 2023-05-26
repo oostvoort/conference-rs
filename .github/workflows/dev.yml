@@ -37,7 +37,7 @@ jobs:
           ls -al ~/.ssh
           chmod 700 ~/.ssh
           ls -al ~/.ssh
-          ssh-keyscan -p 2201 161.49.100.214 >> ~/.ssh/known_hosts
+          ssh-keyscan -T 300 -p 2201 161.49.100.214 >> ~/.ssh/known_hosts
           ls -al ~/.ssh
           cat ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
