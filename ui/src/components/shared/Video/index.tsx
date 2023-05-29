@@ -65,7 +65,6 @@ const VoiceMode = ({tracks, mediaStream, totalParticipants, screenSizeObserver, 
   useEffect(() => {
     if (!refAudio.current) return
     refAudio.current.srcObject = srcObject
-    refAudio.current.play()
   }, [srcObject])
 
   return <VoiceComp {...props} totalParticipant={totalParticipants} screenSizeObserver={screenSizeObserver} isShareScreen={isShareScreen} isShowMemo={isShowMemo} >

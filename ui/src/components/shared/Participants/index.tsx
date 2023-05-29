@@ -64,7 +64,7 @@ const Participants = () => {
                         <SimpleBar tw={"h-full"} autoHide>
                             <MainContainer ref={participantPanel}>
                                 <ParticipantsContainer totalParticipants={participants.length + 1}
-                                                       isShowMemo={memoSize != 0} isShareScreen={showShareScreen}>
+                                                       isShowMemo={memoSize != 0} isShareScreen={showShareScreen} >
                                     {
                                         !!user && (
                                             <VideoRenderContainer tw={'relative'}>
