@@ -21,12 +21,24 @@ jobs:
           #registry: ${{ secrets.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}    
+          
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Build, tag, and push image
-        id: build-image
-        run: |
-          docker build -t oostvoort/conference-rs:dev .
-          docker push oostvoort/conference-rs:dev
+    #  - name: Build, tag, and push image
+   #     id: build-image
+  #      run: |
+ #         docker build -t oostvoort/conference-rs:dev .
+#          docker push oostvoort/conference-rs:dev
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: "oostvoort/conference-rs:dev"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Deploy
         run: |

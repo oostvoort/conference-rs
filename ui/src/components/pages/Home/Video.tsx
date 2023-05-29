@@ -28,7 +28,7 @@ export default function Video() {
             controls={false}
             playsInline={true}
             width={900}
-            className={"drop-shadow-2xl rounded-xl"}
+            className={"drop-shadow-2xl rounded-xl video-element"}
             ref={videoRef}
         />
     )

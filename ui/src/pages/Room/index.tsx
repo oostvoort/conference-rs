@@ -1,26 +1,20 @@
 import {useParams} from "react-router-dom";
 import useConfigStore from "../../config/store.ts";
+import React from "react";
+import 'twin.macro'
+import useJoinRoom from "../../hooks/useRoom/useJoinRoom";
+import Controls from "../../components/pages/Room/Controls";
+import useStore from "../../hooks/useRoom/useStore.ts";
 import {Panel, PanelGroup} from "react-resizable-panels";
-import React, {lazy, Suspense} from "react";
 import {VerticalPanelHandler} from "../../components/shared/PanelBar/VerticalPanelHandler.tsx";
 import {HorizontalPanelHandler} from "../../components/shared/PanelBar/HorizontalPanelHandler.tsx";
-import 'twin.macro'
-import {RoomContainer} from "./_room.comp.tsx";
-import useJoinRoom from "../../hooks/useRoom/useJoinRoom";
+import {RoomContainer} from "../Room/_room.comp.tsx";
+import MeetingNotes from "../../components/pages/Room/MeetingNotes";
+import {MediaStream} from "../../components/shared/MediaStream";
+import {ScreenShare} from "../../components/shared/MediaStream/ScreenShare.tsx";
+import useActiveSpeaker from "../../hooks/useRoom/useActiveSpeaker.ts";
 
-const DynamicLoading = () => {
-    return <>
-        <div tw={"w-[100vw] h-[100vh] flex flex-col justify-center items-center"}><p className={"text-white"}>Loading
-            ...</p></div>
-        ,
-    </>
-}
-
-const DynamicParticipants = lazy(() => import("../../components/shared/Participants"))
-const DynamicMeetingNotes = lazy(() => import("../../components/pages/Room/MeetingNotes"))
-const DynamicControls = lazy(() => import("../../components/pages/Room/Controls"))
-
-export default function Room({isAudioOnly} : {isAudioOnly: boolean}) {
+export default function TestRoom({isAudioOnly}: { isAudioOnly: boolean }) {
     const [, setIsMemoShow] = React.useState<boolean>(false)
     const {id} = useParams()
 
@@ -28,33 +22,103 @@ export default function Room({isAudioOnly} : {isAudioOnly: boolean}) {
 
     const {mutate} = useJoinRoom(isAudioOnly)
 
+    const [
+        user,
+        participants,
+        [screenSharer]
+    ] = useStore(state =>
+        [
+            state.user,
+            state.participants,
+            state.screenSharers
+        ]
+    )
 
     React.useEffect(() => {
-        if (!id) return
         mutate({displayName: userName})
     }, [id, mutate, userName])
+
+
+    const { isUser, activeSpeaker} = useActiveSpeaker()
 
     return (
         <RoomContainer>
             <PanelGroup direction={'vertical'} tw={"w-full h-full"}>
                 <Panel defaultSize={90} tw={"w-full h-full"}>
                     <PanelGroup direction={'horizontal'} tw={"w-full h-full"}>
-                        <Suspense fallback={<DynamicLoading/>}>
-                            <DynamicParticipants/>
-                        </Suspense>
+                        <Panel minSize={15} collapsible={true} className={`${!!screenSharer && 'grid grid-cols-5'} p-6 bg-primary1 gap-2`}>
+                            <div className="flex flex-wrap justify-center w-full h-full gap-1 overflow-y-scroll overflow-x-hidden">
+                                <div className="container">
+                                    <div className="flex flex-wrap w-full h-full justify-center">
+                                        {
+                                            !!user && (
+                                                <MediaStream
+                                                    displayName={user.displayName}
+                                                    mediaStream={user.mediaStream}
+                                                    mediaState={user.mediaState()}
+                                                    muted
+                                                    activeSpeaker={isUser}
+                                                />
+                                            )
+                                        }
+
+                                        {
+                                            participants.map(participant => (
+                                                <MediaStream
+                                                    displayName={participant.displayName}
+                                                    mediaStream={participant.mediaStream}
+                                                    mediaState={participant.mediaState()}
+                                                    activeSpeaker={participant.id === activeSpeaker}
+                                                />
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            {
+                                !!screenSharer && (
+                                    <div
+                                        className={"rounded-2xl col-span-4 w-full h-full overflow-hidden flex items-center"}>
+                                        <div className="w-fit h-fit ">
+                                            <ScreenShare mediaStream={screenSharer.mediaStream}/>
+                                        </div>
+                                    </div>
+                                )
+                            }
+
+                        </Panel>
                         <VerticalPanelHandler/>
-                        <Suspense fallback={<DynamicLoading/>}>
-                            <DynamicMeetingNotes/>
-                        </Suspense>
+                        <MeetingNotes/>
                     </PanelGroup>
                 </Panel>
                 <HorizontalPanelHandler/>
                 <Panel maxSize={10} defaultSize={10} collapsible={true} tw={"w-full h-full"}>
-                    <Suspense fallback={<DynamicLoading/>}>
-                        <DynamicControls onMemoClick={setIsMemoShow}/>
-                    </Suspense>
+                    <Controls onMemoClick={setIsMemoShow}/>
                 </Panel>
             </PanelGroup>
         </RoomContainer>
     )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
