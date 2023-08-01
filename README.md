@@ -2,29 +2,28 @@
 
 # Conference-RS
 An open-sourced video-calling tool. It's comprised of a Vite React WebApp supported by a
-backend written in Rust that is based on [MediaSoup's Architecture](https://mediasoup.org/documentation/v3/mediasoup/design/) 
-to handle video-conferencing. 
+backend written in Rust that is based on [MediaSoup's Architecture](https://mediasoup.org/documentation/v3/mediasoup/design/)
+to handle video-conferencing.
 
-There are two main folders in this repo: server and ui. The server folder houses all the Rust 
-code. It is intended as a backend service with the capability to create rooms as requested and 
-allow users to join rooms for video/audio conferencing. Using reference counting pointers, it 
-is able to keep track of opened rooms and their participants. Using the axum crate, the server 
+There are two main folders in this repo: server and ui. The server folder houses all the Rust
+code. It is intended as a backend service with the capability to create rooms as requested and
+allow users to join rooms for video/audio conferencing. Using reference counting pointers, it
+is able to keep track of opened rooms and their participants. Using the axum crate, the server
 code also serves up the frontend code.
 
 The ui folder includes all frontend code served in the client. It is written in Vite React.
 
-# Features
+## Features
 1. Video-conferencing
 2. Audio only conferencing
 3. Shared Notes within a Room
 4. Screen Sharing
 5. Broadcasting Actions to other participants in a Room
-   * Applause - Sounds of applause are played in a Room briefly
-   * Celebrate - Sounds of celebration are played in a Room briefly accompanied by confetti
+    * Applause - Sounds of applause are played in a Room briefly
+    * Celebrate - Sounds of celebration are played in a Room briefly accompanied by confetti
 
-# Setting up
-There are two ways to set up Conference-RS:
-
+## Getting Started
+There are three ways to set up Conference-RS:
 ## Using Docker Compose (Recommended)
 
 ### Prerequisites
@@ -41,16 +40,33 @@ There are several environment variables that can be set for the container.
 6. RUST_LOG - Level of logging to display in the Rust Code
 
 #### Take Note
-If hosting this image in production, the ports from the RTC_PORT_RANGE_START through the RTC_PORT_RANGE_END 
+If hosting this image in production, the ports from the RTC_PORT_RANGE_START through the RTC_PORT_RANGE_END
 have to be opened up. The server needs them opened to be able to serve up RTCs.
 
 ### Setup
 ````shell
 docker compose up -d
 ````
+## Using Docker CLI
+### Prerequisites
+1. [Docker](https://docs.docker.com/get-docker/)
+### Setup
+- Copy paste the code below on your terminal
+
+````
+docker run -d \
+  --name conference_rs \
+  --restart unless-stopped \
+  -p 3000:3000 \
+  -p 40000-40050:40000-40050 \
+  -e RTC_PORT_RANGE_START=40000 \
+  -e RTC_PORT_RANGE_END=40050 \
+  -e WEBRTC_LISTEN_IP=127.0.0.1 \
+  -e RUST_LOG=server=trace \
+  oostvoort/conference-rs:latest
+````
 
 ## Running Locally
-
 ### Prerequisites
 1. [NodeJS](https://nodejs.org/en/download)
 2. [Rust](https://doc.rust-lang.org/book/ch01-01-installation.html)
@@ -76,10 +92,10 @@ cargo run
 # Additional Resources
 - [GitHub Repository](https://github.com/oostvoort/conference-rs)
 - [Mediasoup Rust](https://docs.rs/mediasoup/latest/mediasoup/)
-  - [MediaSoup producers, consumers, routers](https://mediasoup.org/documentation/v3/mediasoup/design/)
+    - [MediaSoup producers, consumers, routers](https://mediasoup.org/documentation/v3/mediasoup/design/)
 - Reference counting pointers (e.g. Rc and Arc)
-  - [Arc Struct](https://doc.rust-lang.org/std/sync/struct.Arc.html)  
-  - [Youtube Tutorial](https://www.youtube.com/watch?v=CTTiaOo4cbY)
+    - [Arc Struct](https://doc.rust-lang.org/std/sync/struct.Arc.html)
+    - [Youtube Tutorial](https://www.youtube.com/watch?v=CTTiaOo4cbY)
 - [Mutex](https://doc.rust-lang.org/std/sync/struct.Mutex.html)
 - [HashMaps](https://doc.rust-lang.org/std/collections/struct.HashMap.html)
 - [Move](https://doc.rust-lang.org/std/keyword.move.html)
