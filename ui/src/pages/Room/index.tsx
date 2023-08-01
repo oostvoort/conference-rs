@@ -31,7 +31,7 @@ export default function TestRoom({isAudioOnly}: { isAudioOnly: boolean }) {
     React.useEffect(() => {
         if (userName === '' || !id || Number(id) <= 0) {
             setRoomId(Number(id))
-            setOnlyVoice(isAudioOnly ? true : false)
+            setOnlyVoice(isAudioOnly)
             push('/')
         }
     }, [userName, id])
@@ -69,19 +69,36 @@ export default function TestRoom({isAudioOnly}: { isAudioOnly: boolean }) {
 
     const participantsLength = participants.length + 1
     const videoWidth = clsx([
-        'w-[24%]',
-        `${participantsLength === 1 ? 'w-[75%]' : ''}`,
+        `${participantsLength === 1 ? 'w-[70%]' : ''}`,
         `${participantsLength === 2 ? 'w-[49%]' : ''}`,
-        `${(participantsLength >= 3 && participantsLength <= 4) ? 'w-[37%]' : ''}`,
+        `${(participantsLength >= 3 && participantsLength <= 4) ? 'w-[35%]' : ''}`,
         `${(participantsLength >= 5 && participantsLength <= 9) ? 'w-[32%]' : ''}`,
+        `${(participantsLength >= 10) ? 'w-[24%]' : ''}`,
     ])
 
     return (
         <RoomContainer>
             <PanelGroup direction={'vertical'} tw={"w-full h-full"}>
+                <div className={'flex justify-between bg-secondary1 h-[60px] flex'}>
+                    <img
+                        src={'/assets/ov_logo.svg'}
+                        alt={'OV'}
+                        width={121}
+                        height={36}
+                        className={'mx-4'}
+                    />
+                    <img
+                        src={'/assets/icon_refresh.svg'}
+                        alt={'OV'}
+                        width={23}
+                        height={23}
+                        className={'mx-8 cursor-pointer'}
+                        onClick={() => location.reload()}
+                    />
+                </div>
                 <Panel defaultSize={90} tw={"w-full h-full"}>
                     <PanelGroup direction={'horizontal'} tw={"w-full h-full"}>
-                        <Panel minSize={15} collapsible={true} className={`${!!screenSharer && 'grid grid-cols-5'} p-6 bg-primary1 gap-2`}>
+                        <Panel minSize={15} collapsible={true} className={`${!!screenSharer && 'grid grid-cols-5'} p-6 bg-primary2 gap-2`}>
                             <div className="flex flex-wrap justify-center w-full h-full gap-1 overflow-y-auto" ref={participantPanel}>
                                 <div className="w-full">
                                     <div className="flex flex-wrap w-full h-full justify-center">
