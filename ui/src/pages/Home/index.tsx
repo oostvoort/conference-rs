@@ -3,14 +3,12 @@ import React from "react";
 import useConfigStore from "../../config/store.ts";
 import {useNavigate} from "react-router-dom";
 import {Audio} from "../../components/pages/Home/Audio.tsx";
+import useRoomStateStore from "../../config/useRoomStateStore.ts";
 
 export default function Home() {
-
+    const { roomId, onlyVoice, setRoomId, setOnlyVoice } = useRoomStateStore()
     const updateUserName = useConfigStore(state => state.updateUserName)
     const [ username, setUsername ] = React.useState<string>('')
-    const [ roomId, setRoomId ] = React.useState<number>(0)
-
-    const [onlyVoice, setOnlyVoice] = React.useState<boolean>(false)
 
     const push = useNavigate()
 
@@ -48,20 +46,23 @@ export default function Home() {
                     <div className={'flex flex-col h-full justify-between items-center pt-10'}>
                         <img src={'/assets/ov_conf_logo.png'} alt={'OV'} width={295} height={56}/>
                         <div className={'w-full px-8'}>
-                            <form className={'flex gap-1 flex-col'}>
+                            <form className={'flex gap-1 flex-col'} onSubmit={handleJoinRoom}>
                                 <input
                                     type={'text'}
                                     placeholder={'Username'}
                                     className={'w-full my-1 p-4 text-secondary1 text-sm font-semibold rounded-lg bg-secondary2 placeholder-secondary1 ' +
                                         'focus:outline-none focus:border-2 focus:border-green-500'}
                                     onChange={(e) => setUsername(e.target.value)}
+                                    required={true}
                                 />
                                 <input
-                                    type={'text'}
+                                    type={'number'}
                                     placeholder={'Meeting ID'}
                                     className={'w-full my-1 p-4 text-secondary1 text-sm font-semibold rounded-lg bg-secondary2 placeholder-secondary1 ' +
                                         'focus:outline-none focus:border-2 focus:border-green-500'}
+                                    value={roomId <= 0 ? '' : roomId}
                                     onChange={(value) => setRoomId(Number(value.currentTarget.value))}
+                                    required={true}
                                 />
                                 <label className="flex items-center w-full mb-8 my-1 ">
                                     <input type="checkbox"
@@ -70,9 +71,8 @@ export default function Home() {
                                 </label>
 
                                 <button
-                                    type={'button'}
+                                    type={'submit'}
                                     className={'w-full py-4 bg-secondary1 text-white rounded text-sm font-semibold rounded-lg hover:bg-green-700'}
-                                    onClick={handleJoinRoom}
                                 >
                                     Join Meeting
                                 </button>
