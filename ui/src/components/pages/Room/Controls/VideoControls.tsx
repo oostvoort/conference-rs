@@ -4,6 +4,8 @@ import {Button} from "../../../Button.tsx";
 import useStore from "../../../../hooks/useRoom/useStore.ts";
 import {useNavigate} from "react-router-dom";
 import useIsAudioOnly from "../../../../hooks/useRoom/useIsAudioOnly";
+import useConfigStore from "../../../../config/store.ts";
+import useRoomStateStore from "../../../../config/useRoomStateStore.ts";
 
 export const VideoControls = () => {
 
@@ -19,10 +21,15 @@ export const VideoControls = () => {
         state.mediaState
     ])
 
+    const updateUserName = useConfigStore(state => state.updateUserName)
+    const { setRoomId } = useRoomStateStore()
+
     const isAudioOnly = useIsAudioOnly()
 
   function handleLeaveCall() {
     leave()
+    updateUserName('')
+    setRoomId(0)
     navigate("/")
   }
 

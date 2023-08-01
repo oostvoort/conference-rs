@@ -12,7 +12,8 @@ type PropsType = {
     mediaState: MediaState,
     autoplay?: boolean,
     muted?: boolean,
-    activeSpeaker?: boolean
+    activeSpeaker?: boolean,
+    className?: string,
 }
 
 import {motion} from "framer-motion";
@@ -69,12 +70,13 @@ const Video = ({mediaStream, muted}: { mediaStream: MediaStream, muted: boolean 
 }
 
 
-export const MediaStream: React.FunctionComponent<PropsType> = ({mediaStream,mediaState, displayName, muted = false, activeSpeaker = false}) => {
+export const MediaStream: React.FunctionComponent<PropsType> = ({mediaStream,mediaState, displayName, muted = false, activeSpeaker = false, className }) => {
     const isShowAudio = !mediaState.video
 
     return (
         <div className={clsx([
-            'flexing-rectangle w-[500px] h-fit self-center aspect-video m-1 relative rounded-2xl overflow-auto',
+            'flexing-rectangle self-center aspect-video m-1 relative rounded-2xl overflow-auto',
+            `${className}`,
             {'border-4 border-secondary1 divide-solid': activeSpeaker}
         ])}>
             <div className="video-wrapper bg-primary3 ">

@@ -20,9 +20,9 @@ jobs:
         with:
           #registry: ${{ secrets.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_REGISTRY_USER }}
-          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}    
-          
-        
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -54,5 +54,5 @@ jobs:
           cat ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
           echo "executing ssh command"
-          ssh tabula-rasa@161.49.100.214 -p 2201 -C "docker compose -f ~/conference/dev/docker-compose.yml pull && docker compose -f ~/conference/dev/docker-compose.yml up --force-recreate -d"
+          ssh able@122.3.207.69 -p 2203 -oStrictHostKeyChecking=no -C "docker compose -f ~/conferencev2/docker-compose-dev.yml pull && docker compose -f ~/conferencev2/docker-compose-dev.yml up --force-recreate -d"
 #run
