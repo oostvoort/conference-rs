@@ -2,10 +2,12 @@ export const USER_MEDIA_CONSTRAINTS = {
     audio: true,
     video: {
         width: {
-            ideal: 1280
+            ideal: 640,
+            max: 1280,
         },
         height: {
-            ideal: 720
+            ideal: 360,
+            max: 720
         },
         frameRate: {
             ideal: 30
