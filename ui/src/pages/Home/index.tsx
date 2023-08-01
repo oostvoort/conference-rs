@@ -33,7 +33,6 @@ export default function Home() {
                         </div>
                     </div>
                     <div className={'h-full bg-black rounded-xl overflow-hidden'}>
-
                         {
                             onlyVoice ? (
                                 <Audio/>
