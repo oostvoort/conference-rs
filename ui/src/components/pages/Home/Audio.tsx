@@ -26,7 +26,7 @@ export const Audio = () => {
             <div className={'w-[890px] h-[500px] bg-black rounded-lg flex justify-center items-center'}>
                 <img src="/assets/icon_screen_off.svg" alt=""/>
             </div>
-            <audio className="w-full h-12 mt-2" controls={false} ref={audioRef}/>
+            <audio className="w-full h-12 mt-2" controls={false} ref={audioRef} muted={true}/>
         </div>
     )
 }

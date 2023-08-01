@@ -30,6 +30,7 @@ export default function Video() {
             width={900}
             className={"drop-shadow-2xl rounded-xl video-element"}
             ref={videoRef}
+            muted={true}
         />
     )
 
