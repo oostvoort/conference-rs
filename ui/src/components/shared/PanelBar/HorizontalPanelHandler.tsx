@@ -1,4 +1,4 @@
-import { PanelResizeHandle } from 'react-resizable-panels'
+import {PanelResizeHandle} from 'react-resizable-panels'
 
 type PropType = {
     id?: string
@@ -6,7 +6,7 @@ type PropType = {
 export const HorizontalPanelHandler = ({ id }: PropType) => {
     return (
         <PanelResizeHandle
-            className={'my-1 flex-[0_0_1em] relative outline-0 bg-transparent data-[resize-handle-active]:bg-[#ffffff33] transition-colors ease-out duration-500 rounded-[0.25em]'}
+            className={'relative outline-0 bg-transparent data-[resize-handle-active]:bg-[#ffffff33] transition-colors ease-out duration-500 rounded-[0.25em]'}
             id={id}
         >
             <div className={'absolute inset-[50%] rounded-[0.25em] bg-transparent transition-colors'}>

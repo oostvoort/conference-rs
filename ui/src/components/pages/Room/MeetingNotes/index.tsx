@@ -17,7 +17,7 @@ const MeetingNotes = () => {
   }, [ setMemoRef, memoRef ])
 
   return (
-    <Panel minSize={25} defaultSize={0} maxSize={75} collapsible={true} ref={memoRef} onResize={setMemoSize}>
+    <Panel minSize={25} defaultSize={30} maxSize={75} collapsible={true} ref={memoRef} onResize={setMemoSize}>
       <div className={'bg-gray-200 h-full rounded'}>
         <SimpleBar className={'w-full h-full'} autoHide={true}>
           <MeetingNotesComponents />
