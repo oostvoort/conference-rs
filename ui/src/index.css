@@ -4,6 +4,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    .input-style {
+        @apply w-full my-1 p-4 text-secondary1 text-sm font-montserrat font-semibold bg-secondary2 placeholder-secondary1 rounded-lg focus:outline-none focus:border-2 focus:border-green-500
+    }
+}
+
+.quill{
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 154px);
+}
+
+.ql-container {
+    flex: 1 1 0;
+}
+
+
 .full-page {
     min-height: 100vh;
     display: flex;

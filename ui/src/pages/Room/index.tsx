@@ -79,7 +79,7 @@ export default function TestRoom({isAudioOnly}: { isAudioOnly: boolean }) {
     return (
         <RoomContainer>
             <PanelGroup direction={'vertical'} tw={"w-full h-full"}>
-                <div className={'flex justify-between bg-secondary1 h-[60px] flex'}>
+                <div className={'flex justify-between bg-secondary1 h-[60px]'}>
                     <img
                         src={'/assets/ov_logo.svg'}
                         alt={'OV'}
