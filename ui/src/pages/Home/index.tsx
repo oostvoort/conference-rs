@@ -5,16 +5,18 @@ import {useNavigate} from "react-router-dom";
 import {Audio} from "../../components/pages/Home/Audio.tsx";
 import useRoomStateStore from "../../config/useRoomStateStore.ts";
 import clsx from "clsx";
+import useLocalStorage from "../../hooks/useLocalStorage.ts";
 
 export default function Home() {
     const { roomId, onlyVoice, setRoomId, setOnlyVoice } = useRoomStateStore()
     const updateUserName = useConfigStore(state => state.updateUserName)
     const [ username, setUsername ] = React.useState<string>('')
+    const [storedValue, setStoredValue] = useLocalStorage('username', null)
 
     const push = useNavigate()
 
     function handleJoinRoom() {
-        updateUserName(username)
+        updateUserName(storedValue ?? username)
         push(`/${!onlyVoice ? 'room' : 'voice' }/${roomId}`)
     }
 
@@ -48,26 +50,22 @@ export default function Home() {
                         <div className={'w-full px-8'}>
                             <form className={'flex gap-1 flex-col'} onSubmit={handleJoinRoom}>
                                 <input
+                                    value={storedValue ?? username}
+                                    name={'username'}
                                     type={'text'}
                                     placeholder={'Username'}
-                                    className={clsx([
-                                        'w-full my-1 p-4',
-                                        'text-secondary1 text-sm font-montserrat font-semibold',
-                                        'bg-secondary2 placeholder-secondary1 rounded-lg',
-                                        'focus:outline-none focus:border-2 focus:border-green-500'
-                                    ])}
-                                    onChange={(e) => setUsername(e.target.value)}
+                                    className={'input-style'}
+                                    onChange={(e) => {
+                                        setStoredValue(e.target.value)
+                                        setUsername(e.target.value)
+                                    }}
                                     required={true}
                                 />
                                 <input
+                                    name={'meeting_id'}
                                     type={'number'}
                                     placeholder={'Meeting ID'}
-                                    className={clsx([
-                                        'w-full my-1 p-4',
-                                        'text-secondary1 text-sm font-montserrat font-semibold',
-                                        'bg-secondary2 placeholder-secondary1 rounded-lg',
-                                        'focus:outline-none focus:border-2 focus:border-green-500'
-                                    ])}
+                                    className={'input-style'}
                                     value={roomId <= 0 ? '' : roomId}
                                     onChange={(value) => setRoomId(Number(value.currentTarget.value))}
                                     required={true}
