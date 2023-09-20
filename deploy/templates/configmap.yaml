@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: conference-dev
+  namespace: conference-dev
+data:
+  RTC_PORT_RANGE_START: "60000"
+  RTC_PORT_RANGE_END: "60003"
+  SERVER_PORT: "3000"
+  RUST_LOG: server=trace
+  WEBRTC_LISTEN_IP: 0.0.0.0
+  WEBRTC_ANNOUNCED_IP: 188.166.204.153
